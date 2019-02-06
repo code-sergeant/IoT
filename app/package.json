@@ -1,0 +1,17 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "LAMAR",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.88.0",
+    "sawtooth-sdk": "^1.0.5",
+    "sawtooth-sdk-client": "0.0.2",
+    "serialport": "^7.1.4"
+  }
+}
