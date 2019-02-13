@@ -1,5 +1,3 @@
-
-
 'use strict'
 
 const http = require('http')
@@ -11,16 +9,17 @@ const {
   TransactionEncoder
 } = require('sawtooth-sdk-client')
 
+
 // arduino will connect to api of the first node
-const API_URL = 'localhost'
-const API_PORT = 8080
+const API_URL = '5413be31.ngrok.io'
+//const API_PORT = 8080
 
 // helper function to generate addresses based on sha512 hash function 
 const getAddress = (key, length = 64) => {
   return createHash('sha512').update(key).digest('hex').slice(0, length)
 }
 
-const FAMILY = 'fish'
+const FAMILY = 'LAMAR'
 const PREFIX = getAddress(FAMILY, 6)
 
 // create new key-pair
@@ -35,7 +34,7 @@ const makeKeyPair = () => {
 // fetch current state
 const getState = function() {
   return new Promise(function(resolve, reject) {
-    http.get(`http://${API_URL}:${API_PORT}/state?address=${PREFIX}`, (res) => {
+    http.get(`http://${API_URL}/state?address=${PREFIX}`, (res) => {
       res.on('data', function (body) {
         let data = JSON.parse(body).data
         data = data.map(d => Buffer.from(d.data, 'base64'))
@@ -53,30 +52,31 @@ const submitUpdate = (payload, privateKey) => {
     inputs: [PREFIX],
     outputs: [PREFIX],
     familyName: FAMILY,
-    familyVersion: '0.0',
+    familyVersion: '1.0',
     payloadEncoding: 'application/json',
     payloadEncoder: p => Buffer.from(JSON.stringify(p))
   }).create(payload)
-  const batchBytes = new BatchEncoder(privateKey).createEncoded(transaction)
+
+  const batchBytes = new BatchEncoder(privateKey).createEncoded(transaction);
   
-  console.log(payload, "batch bytes:", batchBytes);
-  
-  // request.post({
-  //     url: `http://${API_URL}:${API_PORT}/batches?wait`,
-  //     headers: {'Content-Type': 'application/octet-stream'},
-  //     body: batchBytes
-  //   },
-  //   function (error, response, body) {
-  //       console.log(body)
-  //   }
-  // );
+  console.log("batchBytes: ", batchBytes);
+
+  request.post({
+      url: `http://${API_URL}/batches`,
+      headers: {'Content-Type': 'application/octet-stream'},
+      body: batchBytes
+    },
+    function (error, response, body) {
+        console.log("Error: ", error, "Respone: ", response.statusCode, " " , response.statusMessage ,"Body: ", body);
+    }
+  );
 }
 
 const keypair = makeKeyPair();
-submitUpdate({action:'create', asset:"Test Name", owner:keypair.public}, keypair.private)
+
+submitUpdate({action:'create', asset:"Test Asset", owner:keypair.public}, keypair.private)
 
 console.log("keypair: ", keypair);
-//submitUpdate();
 
 module.exports = {
   makeKeyPair,

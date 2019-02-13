@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "parser-readline": "^1.0.2",
     "request": "^2.88.0",
     "sawtooth-sdk": "^1.0.5",
     "sawtooth-sdk-client": "0.0.2",
